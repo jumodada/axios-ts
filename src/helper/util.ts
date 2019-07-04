@@ -1,9 +1,11 @@
 const toString = Object.prototype.toString
 
-export function isDate(val: any): val is Date {
-  return toString.call(val) === '[object Date]'
+export type type = 'Date' | 'Object'
+
+const types: { [key: string]: string } = {
+  Date: '[object Date]',
+  Object: '[object Object]'
 }
 
-export function isObject(val: any): val is Object {
-  return val !== null && typeof val === 'object'
-}
+export const typeOf = <T>(val: any, typeName: type): val is T =>
+  toString.call(val) === types[typeName]
