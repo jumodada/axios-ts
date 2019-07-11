@@ -1,6 +1,13 @@
 import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from './types'
 import { parseHeaders } from './helper/headers'
 
+function handleResponse(response: AxiosResponse, resolve: any, reject: any): void {
+  if (response.status >= 200 && response.status <= 300) {
+    resolve(response)
+  } else {
+    reject(new Error(`Request failed with status code ${response.status}`))
+  }
+}
 export default function xhr(config: AxiosRequestConfig): AxiosPromise {
   return new Promise((resolve, reject) => {
     const { data = null, url, method = 'GET', headers, responseType, timeout } = config
@@ -17,7 +24,7 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
     xhr.open(method.toUpperCase(), url, true)
 
     xhr.onreadystatechange = function handleLoad() {
-      if (xhr.readyState !== 4) return
+      if (xhr.readyState !== 4 || xhr.status === 0) return
 
       const responseHeaders = parseHeaders(xhr.getAllResponseHeaders())
       const responseData = responseType === 'text' ? xhr.responseType : xhr.response
@@ -29,7 +36,7 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
         config,
         request: xhr
       }
-      resolve(response)
+      handleResponse(response, resolve, reject)
     }
 
     xhr.ontimeout = function handleTimeout() {
