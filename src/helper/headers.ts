@@ -15,7 +15,6 @@ export function processHeaders(headers: any, data: any): any {
   if (typeOf<Object>(data, 'Object')) {
     if (headers && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json; charset=utf-8'
-      console.log(headers['Content-Type'])
     }
   }
   return headers
