@@ -26,7 +26,7 @@ export default class Axios {
     config?: AxiosRequestConfig
   ): AxiosPromise {
     const Config = Object.assign(config || {}, {
-      method: 'delete',
+      method: method,
       url
     })
     return this.request(Config)
@@ -51,7 +51,7 @@ export default class Axios {
     config?: AxiosRequestConfig
   ): AxiosPromise {
     const Config = Object.assign(config || {}, {
-      method: 'delete',
+      method: method,
       url,
       data
     })
