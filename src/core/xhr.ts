@@ -15,6 +15,7 @@ function handleResponse(
     reject(createError(`Request failed with status code ${response.status}`, config, xhr, response))
   }
 }
+
 export default function xhr(config: AxiosRequestConfig): AxiosPromise {
   return new Promise((resolve, reject) => {
     const { data = null, url, method = 'GET', headers, responseType, timeout } = config

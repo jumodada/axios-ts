@@ -9,7 +9,7 @@ export function transformResponse(data: any): any {
   if (typeof data === 'string') {
     try {
       data = JSON.parse(data)
-    } catch (e) {
+    } catch (err) {
       console.warn('data is not a JSON string')
     }
   }
