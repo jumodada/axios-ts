@@ -10,7 +10,7 @@ export function transformResponse(data: any): any {
     try {
       data = JSON.parse(data)
     } catch (err) {
-      console.warn('data is not a JSON string')
+      // err  Nothing Todo
     }
   }
   return data
