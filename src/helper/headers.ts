@@ -12,7 +12,7 @@ const normalizeHeader = (headers: any, normalizedName: string): void => {
   })
 }
 
-export function processHeaders(headers: any, data: any): any {
+export function handleHeaders(headers: any, data: any): any {
   normalizeHeader(headers, 'Content-Type')
   if (typeOf<Object>(data, 'Object')) {
     if (headers && !headers['Content-Type']) {
