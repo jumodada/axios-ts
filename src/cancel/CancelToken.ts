@@ -14,7 +14,7 @@ export default class CancelToken {
     this.promise = new Promise<Cancel>(resolve => (resolvePromise = resolve))
 
     executor(message => {
-      console.log(111)
+      console.log(this)
       if (this.reason) return
       this.reason = new Cancel(message)
       resolvePromise(this.reason)
