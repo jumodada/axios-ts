@@ -104,6 +104,7 @@ export interface Transform {
 export interface CancelToken {
   promise: Promise<Cancel>
   reason?: Cancel
+  throwIfRequested(): void
 }
 
 export interface Canceler {
@@ -121,7 +122,6 @@ export interface CancelTokenSource {
 
 export interface CancelTokenStatic {
   new (executor: CancelExecutor): CancelToken
-
   source(): CancelTokenSource
 }
 

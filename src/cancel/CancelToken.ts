@@ -14,11 +14,14 @@ export default class CancelToken {
     this.promise = new Promise<Cancel>(resolve => (resolvePromise = resolve))
 
     executor(message => {
-      console.log(this)
       if (this.reason) return
       this.reason = new Cancel(message)
       resolvePromise(this.reason)
     })
+  }
+
+  throwIfRequested() {
+    if (this.reason) throw this.reason
   }
 
   static source(): CancelTokenSource {
