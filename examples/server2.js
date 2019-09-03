@@ -18,6 +18,7 @@ const cors = {
 }
 
 router.post('/more/server2', function(req, res) {
+  console.log(req)
   res.set(cors)
   res.json(req.cookies)
 })
