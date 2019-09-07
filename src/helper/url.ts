@@ -46,3 +46,11 @@ export function buildURL(url: string, params?: any): string {
   }
   return url
 }
+
+export function isURLSameOrigin(requestURL: string): boolean {}
+
+const urlParsingNode = document.createElement('a')
+
+function resolveURL(url: string) {
+  urlParsingNode.setAttribute('href', url)
+}

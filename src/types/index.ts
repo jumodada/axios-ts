@@ -28,6 +28,9 @@ export interface AxiosRequestConfig {
   transformResponse?: Transform | Transform[]
   cancelToken?: CancelToken
   withCredentials?: boolean
+  xsrfCookieName?: string
+  xsrfHeaderName?: string
+
   [propName: string]: any
 }
 
@@ -84,6 +87,7 @@ export interface AxiosInstance extends Axios {
 
 export interface AxiosStatic extends AxiosInstance {
   create(config?: AxiosRequestConfig): AxiosInstance
+
   CancelToken: CancelTokenStatic
   Cancel: CancelStatic
   isCancel: (value: any) => boolean
@@ -104,6 +108,7 @@ export interface Transform {
 export interface CancelToken {
   promise: Promise<Cancel>
   reason?: Cancel
+
   throwIfRequested(): void
 }
 
@@ -122,6 +127,7 @@ export interface CancelTokenSource {
 
 export interface CancelTokenStatic {
   new (executor: CancelExecutor): CancelToken
+
   source(): CancelTokenSource
 }
 
