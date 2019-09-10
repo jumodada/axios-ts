@@ -1,6 +1,8 @@
 import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from '../types'
 import { parseHeaders } from '../helper/headers'
 import { createError } from '../helper/error'
+import { isURLSameOrigin } from '../helper/url'
+import { cookie } from '../helper/cookie'
 
 function handleResponse(
   response: AxiosResponse,
@@ -26,7 +28,9 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
       responseType,
       timeout,
       cancelToken,
-      withCredentials
+      withCredentials,
+      xsrfCookieName,
+      xsrfHeaderName
     } = config
 
     const xhr = new XMLHttpRequest()
@@ -69,6 +73,13 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
           xhr
         )
       )
+    }
+
+    if ((withCredentials || isURLSameOrigin(url!)) && xsrfCookieName) {
+      const xsrfValue = cookie.read(xsrfCookieName)
+      if (xsrfValue && xsrfHeaderName) {
+        headers[xsrfHeaderName] = xsrfValue
+      }
     }
     xhr.onerror = function handleError() {
       reject(createError('Network Error', config))
