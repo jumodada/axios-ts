@@ -3,6 +3,7 @@ import { parseHeaders } from '../helper/headers'
 import { createError } from '../helper/error'
 import { isURLSameOrigin } from '../helper/url'
 import { cookie } from '../helper/cookie'
+import { isFormData } from '../helper/util'
 
 function handleResponse(
   response: AxiosResponse,
@@ -30,73 +31,98 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
       cancelToken,
       withCredentials,
       xsrfCookieName,
-      xsrfHeaderName
+      xsrfHeaderName,
+      onDownloadProgress,
+      onUploadProgress
     } = config
 
     const xhr = new XMLHttpRequest()
-
-    if (responseType) {
-      xhr.responseType = responseType
-    }
-
-    if (timeout) {
-      xhr.timeout = timeout
-    }
-
-    if (withCredentials) {
-      xhr.withCredentials = withCredentials
-    }
-
-    xhr.open(method.toUpperCase(), url!, true)
-    xhr.onreadystatechange = function handleLoad() {
-      if (xhr.readyState !== 4 || xhr.status === 0) return
-
-      const responseHeaders = parseHeaders(xhr.getAllResponseHeaders())
-      const responseData = responseType === 'text' ? xhr.responseType : xhr.response
-      const response: AxiosResponse = {
-        data: responseData,
-        status: xhr.status,
-        statusText: xhr.statusText,
-        headers: responseHeaders,
-        config,
-        request: xhr
+    configureRequest()
+    addEvents()
+    handleHeaders()
+    handleCancel()
+    function configureRequest(): void {
+      if (responseType) {
+        xhr.responseType = responseType
       }
-      handleResponse(response, resolve, reject, config, xhr)
+
+      if (timeout) {
+        xhr.timeout = timeout
+      }
+
+      if (withCredentials) {
+        xhr.withCredentials = withCredentials
+      }
     }
 
-    xhr.ontimeout = function handleTimeout() {
-      reject(
-        createError(
-          `The connection could have timed out. timeout is ${timeout}ms`,
+    function addEvents(): void {
+      xhr.open(method.toUpperCase(), url!, true)
+      xhr.onreadystatechange = function handleLoad() {
+        if (xhr.readyState !== 4 || xhr.status === 0) return
+
+        const responseHeaders = parseHeaders(xhr.getAllResponseHeaders())
+        const responseData = responseType === 'text' ? xhr.responseType : xhr.response
+        const response: AxiosResponse = {
+          data: responseData,
+          status: xhr.status,
+          statusText: xhr.statusText,
+          headers: responseHeaders,
           config,
-          'ECONNABORTED',
-          xhr
+          request: xhr
+        }
+        handleResponse(response, resolve, reject, config, xhr)
+      }
+
+      xhr.ontimeout = function handleTimeout() {
+        reject(
+          createError(
+            `The connection could have timed out. timeout is ${timeout}ms`,
+            config,
+            'ECONNABORTED',
+            xhr
+          )
         )
-      )
+      }
+      xhr.onerror = function handleError() {
+        reject(createError('Network Error', config))
+      }
+      if (onDownloadProgress) {
+        xhr.onprogress = onDownloadProgress
+      }
+      if (onUploadProgress) {
+        xhr.upload.onprogress = onUploadProgress
+      }
     }
 
-    if ((withCredentials || isURLSameOrigin(url!)) && xsrfCookieName) {
-      const xsrfValue = cookie.read(xsrfCookieName)
-      if (xsrfValue && xsrfHeaderName) {
-        headers[xsrfHeaderName] = xsrfValue
+    function handleCancel() {
+      if (cancelToken) {
+        cancelToken.promise.then(res => {
+          xhr.abort()
+          reject(res)
+        })
       }
     }
-    xhr.onerror = function handleError() {
-      reject(createError('Network Error', config))
-    }
-    Object.keys(headers).forEach(name => {
-      if (data === null && name.toLowerCase() === 'content-type') {
-        delete headers[name]
-      } else {
-        xhr.setRequestHeader(name, headers[name])
+
+    function handleHeaders() {
+      if (isFormData(data)) {
+        delete headers['Content-Type']
       }
-    })
-    if (cancelToken) {
-      cancelToken.promise.then(res => {
-        xhr.abort()
-        reject(res)
+      if ((withCredentials || isURLSameOrigin(url!)) && xsrfCookieName) {
+        const xsrfValue = cookie.read(xsrfCookieName)
+        if (xsrfValue && xsrfHeaderName) {
+          headers[xsrfHeaderName] = xsrfValue
+        }
+      }
+
+      Object.keys(headers).forEach(name => {
+        if (data === null && name.toLowerCase() === 'content-type') {
+          delete headers[name]
+        } else {
+          xhr.setRequestHeader(name, headers[name])
+        }
       })
     }
+
     xhr.send(data)
   })
 }
