@@ -14,14 +14,36 @@ import  axios from '../../src/index'
 // })
 
 
-const instance = axios.create({
-  xsrfCookieName:'XSRF-TOKEN-D',
-  xsrfHeaderName:'X-XSRF-TOKEN-D'
-})
+// const instance = axios.create({
+//   xsrfCookieName:'XSRF-TOKEN-D',
+//   xsrfHeaderName:'X-XSRF-TOKEN-D'
+// })
+//
+//
+// instance.get('/more/get').then(res=>{
+//   console.log(res)
+// })
+//
+//
+// axios.post('/more/post',{
+//   a:1
+// },{
+//   auth:{
+//     username:'admin',
+//     password:'123456'
+//   }
+// }).then(res=>{
+//   console.log(res)
+// })
 
-
-instance.get('/more/get').then(res=>{
+axios.get('/more/get',{
+  params:new URLSearchParams('a=b&c=d')
+}).then(res=>{
   console.log(res)
 })
 
-
+axios.get('/more/get',{
+  params:'a=b&c=d'
+}).then(res=>{
+  console.log(res)
+})

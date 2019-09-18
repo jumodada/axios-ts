@@ -5,7 +5,7 @@ const _assigns = Object.create(null)
 const _assignKeysFromCurVal = ['url', 'params', 'data']
 _assignKeysFromCurVal.forEach(key => (_assigns[key] = notPreservePreVal))
 
-const _assignKeysDeepMerge = ['headers']
+const _assignKeysDeepMerge = ['headers', 'auth']
 
 _assignKeysDeepMerge.forEach(key => (_assigns[key] = _assignsDeepMerge))
 

@@ -5,20 +5,6 @@ import { isURLSameOrigin } from '../helper/url'
 import { cookie } from '../helper/cookie'
 import { isFormData } from '../helper/util'
 
-function handleResponse(
-  response: AxiosResponse,
-  resolve: any,
-  reject: any,
-  config: AxiosRequestConfig,
-  xhr: any
-): void {
-  if (response.status >= 200 && response.status <= 300) {
-    resolve(response)
-  } else {
-    reject(createError(`Request failed with status code ${response.status}`, config, xhr, response))
-  }
-}
-
 export default function xhr(config: AxiosRequestConfig): AxiosPromise {
   return new Promise((resolve, reject) => {
     const {
@@ -33,7 +19,9 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
       xsrfCookieName,
       xsrfHeaderName,
       onDownloadProgress,
-      onUploadProgress
+      onUploadProgress,
+      auth,
+      validateStatus
     } = config
 
     const xhr = new XMLHttpRequest()
@@ -41,6 +29,7 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
     addEvents()
     handleHeaders()
     handleCancel()
+
     function configureRequest(): void {
       if (responseType) {
         xhr.responseType = responseType
@@ -54,7 +43,21 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
         xhr.withCredentials = withCredentials
       }
     }
-
+    function handleResponse(response: AxiosResponse): void {
+      if (!validateStatus || validateStatus(response.status)) {
+        resolve(response)
+      } else {
+        reject(
+          createError(
+            `Request failed with status code ${response.status}`,
+            config,
+            null,
+            xhr,
+            response
+          )
+        )
+      }
+    }
     function addEvents(): void {
       xhr.open(method.toUpperCase(), url!, true)
       xhr.onreadystatechange = function handleLoad() {
@@ -70,7 +73,7 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
           config,
           request: xhr
         }
-        handleResponse(response, resolve, reject, config, xhr)
+        handleResponse(response)
       }
 
       xhr.ontimeout = function handleTimeout() {
@@ -113,7 +116,9 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
           headers[xsrfHeaderName] = xsrfValue
         }
       }
-
+      if (auth) {
+        headers['Authorization'] = 'Basic ' + btoa(auth.username + ':' + auth.password)
+      }
       Object.keys(headers).forEach(name => {
         if (data === null && name.toLowerCase() === 'content-type') {
           delete headers[name]
