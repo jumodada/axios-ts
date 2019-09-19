@@ -36,14 +36,32 @@ import  axios from '../../src/index'
 //   console.log(res)
 // })
 
-axios.get('/more/get',{
-  params:new URLSearchParams('a=b&c=d')
-}).then(res=>{
-  console.log(res)
+// axios.get('/more/get',{
+//   params:new URLSearchParams('a=b&c=d')
+// }).then(res=>{
+//   console.log(res)
+// })
+//
+// axios.get('/more/get',{
+//   params:'a=b&c=d'
+// }).then(res=>{
+//   console.log(res)
+// })
+// let params = new URLSearchParams();
+// params.append('name', 'admin');
+// params.append('age', '18');
+// axios({
+//   method: 'get',
+//   url: '/more/get',
+//   params
+// }).then(res=>{
+//   console.log(res)
+// })
+
+
+const instance =  axios.create({
+  baseURL:'http://a.hiphotos.baidu.com/'
 })
 
-axios.get('/more/get',{
-  params:'a=b&c=d'
-}).then(res=>{
-  console.log(res)
-})
+instance.get('image/pic/item/838ba61ea8d3fd1fc9c7b6853a4e251f94ca5f46.jpg')
+
