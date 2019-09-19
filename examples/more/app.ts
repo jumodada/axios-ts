@@ -59,9 +59,28 @@ import  axios from '../../src/index'
 // })
 
 
-const instance =  axios.create({
-  baseURL:'http://a.hiphotos.baidu.com/'
+// const instance =  axios.create({
+//   baseURL:'http://a.hiphotos.baidu.com/'
+// })
+//
+// instance.get('image/pic/item/838ba61ea8d3fd1fc9c7b6853a4e251f94ca5f46.jpg')
+//
+
+
+function getA() {
+  return axios.get('/more/A')
+}
+
+function getB() {
+  return axios.get('/more/B')
+}
+axios.all([getA(),getB()]).then(axios.spread(function (resA,resB) {
+  console.log(resA)
+  console.log(resB)
+}))
+
+
+axios.all([getA(),getB()]).then(([resA,resB])=>{
+  console.log(resA)
+  console.log(resB)
 })
-
-instance.get('image/pic/item/838ba61ea8d3fd1fc9c7b6853a4e251f94ca5f46.jpg')
-

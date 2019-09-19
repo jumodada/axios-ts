@@ -7,7 +7,7 @@ import {
   ResolvedFn,
   Interceptors
 } from '../types'
-import dispatchRequest from './dispatchRequest'
+import dispatchRequest, { transformURL } from './dispatchRequest'
 import InterceptorManager from './interceptorManager'
 import mergeConfig from './merge-config'
 
@@ -94,6 +94,10 @@ export default class Axios {
     return this._requestMethodWithData('patch', url, data, config)
   }
 
+  getUri(config?: AxiosRequestConfig): string {
+    config = mergeConfig(this.defaults, config!)
+    return transformURL(config!)
+  }
   _requestMethodWithData(
     method: Method,
     url: string,
