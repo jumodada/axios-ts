@@ -37,7 +37,7 @@ function _assignsDeepMerge(preVal: any, curVal?: any): any {
     return curVal
   } else if (typeOf(preVal, 'Object')) {
     return deepMerge(preVal)
-  } else if (typeof preVal !== 'undefined') {
+  } else {
     return preVal
   }
 }

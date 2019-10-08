@@ -43,6 +43,7 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
         xhr.withCredentials = withCredentials
       }
     }
+
     function handleResponse(response: AxiosResponse): void {
       if (!validateStatus || validateStatus(response.status)) {
         resolve(response)
@@ -58,6 +59,7 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
         )
       }
     }
+
     function addEvents(): void {
       xhr.open(method.toUpperCase(), url!, true)
       xhr.onreadystatechange = function handleLoad() {
@@ -99,10 +101,17 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
 
     function handleCancel() {
       if (cancelToken) {
-        cancelToken.promise.then(res => {
-          xhr.abort()
-          reject(res)
-        })
+        cancelToken.promise
+          .then(res => {
+            xhr.abort()
+            reject(res)
+          })
+          .catch(
+            /* istanbul ignore next  */
+            err => {
+              console.log(err)
+            }
+          )
       }
     }
 
